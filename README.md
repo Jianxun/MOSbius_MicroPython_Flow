@@ -23,3 +23,6 @@
 - The console will print out the connections and the bitstream, check them against your `connections.json` file.
 ![](./screenshots/programming_MOSbius.png)
 - Done
+
+# Running the flow on non-MicroPython hosts
+The `main.py` script can detect if it is running on a MicroPython implementation. If not it will create the MOSbius object without valid GPIO pin configurations. You should be able to create a bitstream from a .json file and export it to `bitstream.csv`, which can be loaded into Scopy to program the MOSbius chip with an ADALM2000 if you don't have a RPI pico available.
