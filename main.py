@@ -19,11 +19,8 @@ def main():
         # Not running on MCU, program_bitstream will not work.
         chip = MOSbius.mosbius_mk1()
 
-
-
     # Select connections file
-    #filename_connections = 'connections.json'
-    filename_connections = 'ring_oscillator.json'
+    filename_connections = 'connections.json'
     
     with open(filename_connections,'r') as file:
         dict_connections = json.load(file)
