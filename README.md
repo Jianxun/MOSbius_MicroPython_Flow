@@ -1,19 +1,24 @@
+# About
+This project is the MicroPython workflow of the MOSbius chip (https://mosbius.org). 
+Any MCU platform that is capable of running MicroPython can be used to program the MOSbius but Raspberry Pi Pico is recommended.
+
+# Raspberry Pi Pico
+Follow the official tutorials and install MicroPython firmware onto the Raspberry Pi Pico.
+https://projects.raspberrypi.org/en/projects/getting-started-with-the-pico
+
 # Python IDE
-- Download and install the Thonny Python IDE (https://thonny.org/)
-- Alternatively uou can use your favorite IDE and Python distribution. Thonny is recommended by the Raspberry Pi Pico official tutorials.
+You can use Thonny (https://thonny.org/), which is recommended by the official tutorial. This is beginner friendly IDE. You can easily move files between you computer and the RPi Pico.
 
-# Install the MicroPython Firmware
-- Open Thonny
-- Connect a Rapsberry Pi Pico to your computer with an USB cable while pressing the `BOOTSEL` button.
-- The Raspberry Pi Pico should appear as a USB drive.
-- In Thonny, click the bottom right corner and select `Install MicroPython`.
-- Choose the target RPI Pico variant then click `Install`.
+If you are a more experienced Python user, and want a nicer IDE with code completion, you can use the VSCode + MicroPico plugin.
+ 
+# Upload Files
+`MOSbius.py`, `main.py`, and `connections.json` are essential files that need to be uploaded to the RPi Pico.
 
-# Upload files
-- Click the bottom right corner again and select your board. 
-- In the `Files` window, right click `main.py` and select `Upload to /`
+If you are using Thonny, right click them in the files window and select `Upload to /`
 ![](./screenshots/upload_files_to_rpi_pico.png)
-- Do the same with `MOSbius.py` and `connections.json`
+
+If you are using VSCode + MicroPico, you can right click on the files and select `Upload file to Pico`, or `Upload project to Pico`.
+![](./screenshots/upload_files_to_rpi_pico_vscode.png)
 
 # Program MOSbius with the Raspberry Pi Pico
 - Connect the `EN`, `CLK` and `DATA` pins (pin numbers defined in `main.py`) to the MOSBIUS PCB (top pins) and short the corresponding jumpers on the left.

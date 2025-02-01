@@ -26,9 +26,9 @@ def main():
         dict_connections = json.load(file)
         
     chip.create_bitstream(dict_connections)
-    chip.export_bitstream_to_csv()
+    #chip.export_bitstream_to_csv()
     
-    #optional visualizations
+    #optional debugging information
     chip.print_connections()
     chip.display_connections()
     
