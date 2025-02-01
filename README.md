@@ -21,7 +21,7 @@ If you are using VSCode + MicroPico, you can right click on the files and select
 ![](./screenshots/upload_files_to_rpi_pico_vscode.png)
 
 # Program MOSbius with the Raspberry Pi Pico
-- Connect GPIO `10`, `11`, and `12` pins on the RPi Pico to the `EN`, `CLK` and `DATA` pins on the MOSBIUS PCB (top pins) and short the corresponding jumpers to the left.
+- Connect GPIO `10`, `11`, and `12` pins on the RPi Pico to the `EN`, `CLK` and `DATA` pins on the MOSBIUS PCB (top pins) and short the corresponding jumpers to the left. Feel free to use other GPIO pins by modifying the definitions in `main.py`.
 - Connect the `LDO` and `GND` pins on the MOSbius PCB to the Raspberry Pi GND and 3.3V power pin.
 - Below is an example setup with breadboards.
 ![](./screenshots/RPi_Pico_connections.png)
