@@ -2,9 +2,9 @@ import json
 import sys
 import MOSbius
 
-PIN_EN = 18
-PIN_CLK = 17
-PIN_DATA = 16
+PIN_EN = 10
+PIN_CLK = 11
+PIN_DATA = 12
 
 def main():
 
