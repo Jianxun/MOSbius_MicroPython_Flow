@@ -44,7 +44,9 @@ class mosbius_mk1:
             if f'{bus}' in dict_connections:
                 pin_list = dict_connections[f'{bus}']
             else:
-                raise ValueError(f'JSON file error: missing bus entry {bus}.')
+                # PK change: if bus is not listed, than just keep empty
+                # raise ValueError(f'JSON file error: missing bus entry {bus}.')
+                pin_list = []
                 
             for pin in pin_list:
                 if pin in self.VALID_PIN_ENUM:
