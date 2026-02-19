@@ -1,5 +1,8 @@
+import os
 import sys
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__)) if "__file__" in globals() else "."
+sys.path.insert(0, os.path.join(BASE_DIR, "lib"))
 from driver import MOSbiusV2Driver
 
 # User-editable settings.

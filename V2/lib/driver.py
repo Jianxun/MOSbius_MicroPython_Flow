@@ -36,7 +36,7 @@ class MOSbiusV2Driver:
 
     @classmethod
     def default_config_path(cls):
-        return os.path.join(cls._base_dir(), "config.json")
+        return os.path.join(cls._project_dir(), "config.json")
 
     @classmethod
     def _default_pin_map_path(cls):
@@ -44,7 +44,11 @@ class MOSbiusV2Driver:
 
     @classmethod
     def _resolve_local_path(cls, relative_path):
-        return os.path.join(cls._base_dir(), relative_path)
+        return os.path.join(cls._project_dir(), relative_path)
+
+    @classmethod
+    def _project_dir(cls):
+        return os.path.dirname(cls._base_dir())
 
     def build_bitstream_from_config(self):
         config = load_json(self.config_path)
