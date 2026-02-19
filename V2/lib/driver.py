@@ -35,16 +35,14 @@ class MOSbiusV2Driver:
         return "."
 
     @classmethod
-    def default_config_path(cls):
-        return os.path.join(cls._project_dir(), "config.json")
-
-    @classmethod
     def _default_pin_map_path(cls):
         return os.path.join(cls._base_dir(), "chip_config_data", "pin_name_to_sw_matrix_pin_number.json")
 
     @classmethod
-    def _resolve_local_path(cls, relative_path):
-        return os.path.join(cls._project_dir(), relative_path)
+    def _resolve_local_path(cls, path):
+        if os.path.isabs(path):
+            return path
+        return os.path.join(cls._project_dir(), path)
 
     @classmethod
     def _project_dir(cls):
@@ -54,7 +52,12 @@ class MOSbiusV2Driver:
         config = load_json(self.config_path)
         pin_to_sw_matrix = load_json(self.pin_map_path)
         normalized = validate_and_normalize_config(config, pin_to_sw_matrix)
-        bitstream = build_bitstream(normalized["connections"], normalized["sizes"], pin_to_sw_matrix)
+        bitstream = build_bitstream(
+            normalized["connections"],
+            normalized["sizes"],
+            pin_to_sw_matrix,
+            track_sources=self.write_debug_bitstream,
+        )
         return bitstream
 
     def program_from_config(self):

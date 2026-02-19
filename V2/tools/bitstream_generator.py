@@ -161,6 +161,7 @@ def main():
         normalized["connections"],
         normalized["sizes"],
         pin_to_sw_matrix,
+        track_sources=True,
     )
 
     write_bitstream_text(output_path, bitstream, order=order, m2k=m2k)

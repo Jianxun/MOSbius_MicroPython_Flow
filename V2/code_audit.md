@@ -12,6 +12,21 @@
   - `87eedd1` Refactor V2 generator to use register equations
   - `a0218da` Add V2 register-map equations and validators
 
+## Status Update (2026-02-19)
+
+Completed cleanup:
+
+- Pin defaults removed from `V2/lib/settings.py`; runtime pin/timing edits live in `V2/main.py`.
+- `V2/lib/bitstream_loader.py` moved to `V2/tools/bitstream_loader.py`.
+- `V2/lib/driver.py` config path now supports absolute paths and resolves relative paths against the runtime root (directory containing `main.py` and `lib/`).
+- Removed dead helpers:
+  - `MOSbiusV2Driver.default_config_path()`
+  - `config_io.default_path_near_module()`
+- Added optional low-memory build mode:
+  - `build_bitstream(..., track_sources=False)` by default.
+  - Runtime driver uses `track_sources=False`.
+  - Host generator uses `track_sources=True`.
+
 ## Current Runtime Layout
 
 - User-facing runtime entrypoint:
@@ -27,11 +42,11 @@
   - `V2/lib/programmer.py`
   - `V2/lib/register_map_equations.py`
   - `V2/lib/settings.py`
-  - `V2/lib/bitstream_loader.py`
   - `V2/lib/chip_config_data/pin_name_to_sw_matrix_pin_number.json`
 
 - Host/tools are separated under:
   - `V2/tools/*`
+  - includes `V2/tools/bitstream_loader.py`
 
 ## Confirmed Runtime Behavior
 

@@ -7,20 +7,22 @@ def _set_bit(bitstream, register, value, source, set_sources):
     if register < 1 or register > EXPECTED_BITS:
         raise ValueError("{}: register {} out of range 1..{}".format(source, register, EXPECTED_BITS))
     index = register - 1
-    current = bitstream[index]
-    if set_sources[index] is not None and current != value:
-        raise ValueError(
-            "{}: conflicting write for register {} ({} -> {}, previous source: {})".format(
-                source, register, current, value, set_sources[index]
+    if set_sources is not None:
+        current = bitstream[index]
+        if set_sources[index] is not None and current != value:
+            raise ValueError(
+                "{}: conflicting write for register {} ({} -> {}, previous source: {})".format(
+                    source, register, current, value, set_sources[index]
+                )
             )
-        )
     bitstream[index] = value
-    set_sources[index] = source
+    if set_sources is not None:
+        set_sources[index] = source
 
 
-def build_bitstream(connections, sizes, pin_to_sw_matrix):
+def build_bitstream(connections, sizes, pin_to_sw_matrix, track_sources=False):
     bitstream = bytearray(EXPECTED_BITS)
-    set_sources = [None] * EXPECTED_BITS
+    set_sources = [None] * EXPECTED_BITS if track_sources else None
 
     for bus, entries in connections.items():
         if bus.startswith("RBUS"):

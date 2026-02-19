@@ -1,9 +1,6 @@
 import time
 
-from settings import T_CLK_HALF_CYCLE_US
-
-
-def program_bitstream(bitstream, pin_en, pin_clk, pin_data, t_clk_half_cycle_us=T_CLK_HALF_CYCLE_US):
+def program_bitstream(bitstream, pin_en, pin_clk, pin_data, t_clk_half_cycle_us):
     if pin_en is None or pin_clk is None or pin_data is None:
         raise ValueError("GPIO pins are not initialized")
     if not bitstream:

@@ -1,17 +1,9 @@
 import json
-import os
 
 
 def load_json(path):
     with open(path, "r") as f:
         return json.load(f)
-
-
-def default_path_near_module(filename):
-    if "__file__" in globals():
-        return os.path.join(os.path.dirname(__file__), filename)
-    return filename
-
 
 def write_bitstream_text(path, bitstream, order="asc", m2k=False):
     if order not in ("asc", "desc"):

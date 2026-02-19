@@ -11,6 +11,8 @@ This folder contains host-side utilities (not required on Pico runtime).
   - Verifies switch-matrix equations match reference register map JSON.
 - `validate_sizing_equations.py`
   - Verifies sizing equations match reference sizing register map JSON.
+- `bitstream_loader.py`
+  - Programs a prebuilt bitstream text file to hardware (MicroPython runtime only).
 - `config_ref.json`
   - Reference config used for regression/golden checks.
 - `bitstream.txt`
@@ -79,6 +81,20 @@ Both scripts support `--map` to validate an alternate JSON file:
 ```bash
 python3 V2/tools/validate_register_equations.py --map /tmp/switch_matrix_register_map.json
 python3 V2/tools/validate_sizing_equations.py --map /tmp/device_name_to_sizing_registers.json
+```
+
+## Bitstream Loader
+
+Program a prebuilt bitstream file (when running on MicroPython):
+
+```bash
+python3 V2/tools/bitstream_loader.py V2/tools/bitstream.txt
+```
+
+Override pin/timing parameters:
+
+```bash
+python3 V2/tools/bitstream_loader.py V2/tools/bitstream.txt --pin-en 18 --pin-clk 17 --pin-data 16 --t-half-us 10
 ```
 
 ## Golden Regression Example

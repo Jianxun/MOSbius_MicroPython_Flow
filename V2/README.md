@@ -39,4 +39,4 @@ When `main.py` runs:
 
 - The runtime validates config and fails fast on invalid buses/pins/sizing.
 - On desktop Python, `main.py` generates the bitstream but skips GPIO programming.
-- Optional loader exists at `V2/lib/bitstream_loader.py` for programming from an existing bitstream text file.
+- Optional loader for prebuilt bitstreams lives in `V2/tools/bitstream_loader.py` (host/tool helper, not runtime).
