@@ -1,6 +1,10 @@
 import os
 import sys
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+LIB_DIR = os.path.join(os.path.dirname(BASE_DIR), "lib")
+sys.path.insert(0, LIB_DIR)
+
 from bitstream_builder import build_bitstream
 from config_io import load_json, write_bitstream_text
 from config_validation import validate_and_normalize_config
@@ -139,13 +143,14 @@ def _parse_args(argv, default_config, default_output):
 
 
 def main():
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    default_config = os.path.join(base_dir, "config.json")
+    base_dir = BASE_DIR
+    default_config = os.path.join(os.path.dirname(base_dir), "config.json")
     default_output = os.path.join(base_dir, "bitstream.txt")
     config_path, output_path, order, csv_path, m2k = _parse_args(sys.argv, default_config, default_output)
 
     mapping_dir = os.path.join(base_dir, "chip_config_data")
-    pin_map_path = os.path.join(mapping_dir, "pin_name_to_sw_matrix_pin_number.json")
+    runtime_mapping_dir = os.path.join(LIB_DIR, "chip_config_data")
+    pin_map_path = os.path.join(runtime_mapping_dir, "pin_name_to_sw_matrix_pin_number.json")
     pin_name_to_number_path = os.path.join(mapping_dir, "pin_name_to_number.json")
 
     config = load_json(config_path)
