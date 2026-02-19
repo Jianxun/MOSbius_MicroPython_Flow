@@ -1,19 +1,10 @@
-import json
 import os
 import sys
 
-import register_map_equations as reg_eq
-
-MAX_REGISTER = 2008
-
-
-def _load_json(path):
-    with open(path, "r") as f:
-        return json.load(f)
-
-
-def _warn(message):
-    print(f"Warning: {message}")
+from bitstream_builder import build_bitstream
+from config_io import load_json, write_bitstream_text
+from config_validation import validate_and_normalize_config
+from connection_semantics import normalize_sbus_mode_for_csv
 
 
 def _bus_sort_key(bus):
@@ -37,43 +28,6 @@ def _bus_sort_key(bus):
     return (prefix, number, suffix, bus)
 
 
-def _parse_terminal_and_mode(value):
-    if "@" not in value:
-        return value, None, False
-    terminal, mode = value.rsplit("@", 1)
-    mode = mode.strip().upper()
-    if mode not in ("ON", "OFF", "PHI1", "PHI2"):
-        _warn(f"SBUS: unknown suffix '{mode}' in '{value}', defaulting to ON")
-        return terminal, "ON", True
-    return terminal, mode, True
-
-
-def _set_bit(bitstream, register, value, source, set_sources):
-    if register < 1 or register > MAX_REGISTER:
-        _warn(f"{source}: register {register} out of range 1..{MAX_REGISTER}")
-        return
-    index = register - 1
-    current = bitstream[index]
-    if set_sources[index] is not None and current != value:
-        _warn(
-            f"{source}: overwriting register {register} from {current} to {value} "
-            f"(previously set by {set_sources[index]})"
-        )
-    bitstream[index] = value
-    set_sources[index] = source
-
-
-def _normalize_sbus_mode(mode):
-    mode = (mode or "OFF").upper()
-    if mode == "PHI1":
-        return "PH1"
-    if mode == "PHI2":
-        return "PH2"
-    if mode in ("ON", "OFF"):
-        return mode
-    return "OFF"
-
-
 def _build_csv_table(connections, pin_name_to_number):
     buses = sorted(connections.keys(), key=_bus_sort_key)
     rbus_pins = {}
@@ -85,33 +39,17 @@ def _build_csv_table(connections, pin_name_to_number):
             rbus_pins[bus] = set(entries)
             pins.update(entries)
             continue
+
         if not bus.startswith("SBUS"):
             continue
 
-        has_suffix = bus[-1:] in ("a", "b")
         sbus_modes[bus] = {}
         for entry in entries:
-            if isinstance(entry, str):
-                terminal, parsed_mode, _ = _parse_terminal_and_mode(entry)
-                connection = parsed_mode or "ON"
-            elif isinstance(entry, dict):
-                terminal = entry.get("terminal")
-                connection = entry.get("connection", "OFF")
-                if terminal is None:
-                    continue
-                terminal, parsed_mode, had_suffix = _parse_terminal_and_mode(terminal)
-                if had_suffix:
-                    connection = parsed_mode
-            else:
-                continue
-
+            terminal = entry["terminal"]
+            connection = entry["connection"]
             pins.add(terminal)
-            if has_suffix:
-                sbus_modes[bus][terminal] = _normalize_sbus_mode(connection)
-            else:
-                sbus_modes[bus][terminal] = _normalize_sbus_mode(connection)
+            sbus_modes[bus][terminal] = normalize_sbus_mode_for_csv(connection)
 
-    rows = []
     def _pin_sort_key(pin_name):
         pin_num = pin_name_to_number.get(pin_name)
         try:
@@ -119,12 +57,12 @@ def _build_csv_table(connections, pin_name_to_number):
         except (TypeError, ValueError):
             return 10**9
 
+    rows = []
     for pin in sorted(pins, key=_pin_sort_key):
         pin_num = pin_name_to_number.get(pin)
         if pin_num is None:
-            _warn(f"CSV: pin '{pin}' not found in pin_name_to_number mapping")
-            continue
-        row_label = f"{int(pin_num)}:{pin}"
+            raise ValueError("CSV: pin '{}' not found in pin_name_to_number mapping".format(pin))
+        row_label = "{}:{}".format(int(pin_num), pin)
         row = [row_label]
         for bus in buses:
             if bus.startswith("RBUS"):
@@ -136,8 +74,7 @@ def _build_csv_table(connections, pin_name_to_number):
                 row.append("")
         rows.append(row)
 
-    header = ["pin"] + buses
-    return header, rows
+    return ["pin"] + buses, rows
 
 
 def _write_csv(output_path, header, rows):
@@ -147,154 +84,11 @@ def _write_csv(output_path, header, rows):
             f.write(",".join(row) + "\n")
 
 
-def _apply_connections(bitstream, connections, pin_to_sw_matrix, set_sources):
-    for bus, entries in connections.items():
-        if bus.startswith("RBUS"):
-            for pin in entries:
-                sw_matrix_pin = pin_to_sw_matrix.get(pin)
-                if sw_matrix_pin is None:
-                    _warn(f"RBUS: pin '{pin}' not found in pin-to-switch map")
-                    continue
-                try:
-                    register = reg_eq.rbus_register(sw_matrix_pin, bus)
-                except ValueError as exc:
-                    _warn(f"RBUS: {exc}")
-                    continue
-                _set_bit(bitstream, register, 1, f"RBUS {bus} pin {pin}", set_sources)
-        elif bus.startswith("SBUS"):
-            has_suffix = bus[-1:] in ("a", "b")
-            for entry in entries:
-                if isinstance(entry, str):
-                    terminal, parsed_mode, _ = _parse_terminal_and_mode(entry)
-                    connection = parsed_mode or "ON"
-                elif isinstance(entry, dict):
-                    terminal = entry.get("terminal")
-                    connection = entry.get("connection", "OFF")
-                    if terminal is None:
-                        _warn(f"SBUS: missing terminal in {entry}")
-                        continue
-                    terminal, parsed_mode, had_suffix = _parse_terminal_and_mode(terminal)
-                    if had_suffix:
-                        if "connection" in entry and connection != parsed_mode:
-                            _warn(
-                                f"SBUS: terminal suffix overrides connection "
-                                f"({connection} -> {parsed_mode}) for '{terminal}'"
-                            )
-                        connection = parsed_mode
-                else:
-                    _warn(f"SBUS: invalid entry type {type(entry).__name__}: {entry}")
-                    continue
-
-                sw_matrix_pin = pin_to_sw_matrix.get(terminal)
-                if sw_matrix_pin is None:
-                    _warn(f"SBUS: terminal '{terminal}' not found in pin-to-switch map")
-                    continue
-
-                if has_suffix:
-                    try:
-                        register = reg_eq.sbus_register(sw_matrix_pin, bus)
-                    except ValueError as exc:
-                        _warn(f"SBUS: {exc}")
-                        continue
-                    if connection in ("ON", "OFF"):
-                        value = 1 if connection == "ON" else 0
-                    elif connection == "PHI1":
-                        value = 1 if bus.endswith("a") else 0
-                    elif connection == "PHI2":
-                        value = 0 if bus.endswith("a") else 1
-                    else:
-                        value = 0
-                    _set_bit(
-                        bitstream,
-                        register,
-                        value,
-                        f"SBUS {bus} {terminal} {connection}",
-                        set_sources,
-                    )
-                    continue
-
-                sbus_a = f"{bus}a"
-                sbus_b = f"{bus}b"
-                try:
-                    register_a = reg_eq.sbus_register(sw_matrix_pin, sbus_a)
-                    register_b = reg_eq.sbus_register(sw_matrix_pin, sbus_b)
-                except ValueError as exc:
-                    _warn(f"SBUS: {exc}")
-                    continue
-
-                if connection == "ON":
-                    a_value, b_value = 1, 1
-                elif connection == "PHI1":
-                    a_value, b_value = 1, 0
-                elif connection == "PHI2":
-                    a_value, b_value = 0, 1
-                else:
-                    a_value, b_value = 0, 0
-
-                _set_bit(
-                    bitstream,
-                    register_a,
-                    a_value,
-                    f"SBUS {bus} {terminal} {connection}",
-                    set_sources,
-                )
-                _set_bit(
-                    bitstream,
-                    register_b,
-                    b_value,
-                    f"SBUS {bus} {terminal} {connection}",
-                    set_sources,
-                )
-        else:
-            _warn(f"Unknown bus '{bus}' (expected RBUS/SBUS)")
-
-
-def _normalize_size_value(device, raw):
-    if isinstance(raw, list):
-        if len(raw) != 1:
-            _warn(f"sizes {device}: list must contain exactly one value; defaulting to 0")
-            return 0
-        raw = raw[0]
-    try:
-        return int(raw)
-    except (TypeError, ValueError):
-        _warn(f"sizes {device}: invalid value {raw!r}; defaulting to 0")
-        return 0
-
-
-def _apply_sizes(bitstream, sizes, set_sources):
-    known_devices = set(reg_eq.SIZING_DEVICE_ORDER)
-    for device in sorted(set(sizes.keys()) - known_devices):
-        _warn(f"sizes: unknown device '{device}' (ignored)")
-
-    for device in reg_eq.SIZING_DEVICE_ORDER:
-        size = _normalize_size_value(device, sizes.get(device, 0))
-        if not (0 <= size <= 31):
-            _warn(f"size {size} for device {device} is not 5-bit; defaulting to 0")
-            size = 0
-        for bit in (1, 2, 4, 8, 16):
-            register = reg_eq.sizing_register(device, bit)
-            value = 1 if bit & size else 0
-            _set_bit(bitstream, register, value, f"sizes {device} bit {bit}", set_sources)
-
-
-def _write_bitstream(bitstream, output_path, order, m2k):
-    if order == "desc":
-        iterable = reversed(bitstream)
-    else:
-        iterable = bitstream
-    with open(output_path, "w") as f:
-        if m2k:
-            f.write("0\n")
-        for bit in iterable:
-            f.write(f"{bit}\n")
-
-
 def _usage():
     script = os.path.basename(sys.argv[0])
     return (
-        f"Usage: {script} [config.json] [output.txt] [--order asc|desc] [--csv path] [--m2k]\\n"
-        f"Defaults: config.json in script folder, output=bitstream.txt, order=asc\\n"
+        "Usage: {} [config.json] [output.txt] [--order asc|desc] [--csv path] [--m2k]\\n".format(script)
+        + "Defaults: config.json in script folder, output=bitstream.txt, order=asc\\n"
     )
 
 
@@ -330,6 +124,7 @@ def _parse_args(argv, default_config, default_output):
         else:
             positionals.append(arg)
         i += 1
+
     if len(positionals) >= 1:
         config_path = positionals[0]
     if len(positionals) >= 2:
@@ -351,32 +146,27 @@ def main():
 
     mapping_dir = os.path.join(base_dir, "chip_config_data")
     pin_map_path = os.path.join(mapping_dir, "pin_name_to_sw_matrix_pin_number.json")
-
-    config = _load_json(config_path)
-    connections = config.get("connections", config if isinstance(config, dict) else {})
-    sizes = config.get("sizes", {})
-
-    pin_to_sw_matrix = _load_json(pin_map_path)
     pin_name_to_number_path = os.path.join(mapping_dir, "pin_name_to_number.json")
-    pin_name_to_number = _load_json(pin_name_to_number_path)
 
-    bitstream = [0] * MAX_REGISTER
-    set_sources = [None] * MAX_REGISTER
-    if connections:
-        _apply_connections(bitstream, connections, pin_to_sw_matrix, set_sources)
-    if sizes:
-        _apply_sizes(bitstream, sizes, set_sources)
+    config = load_json(config_path)
+    pin_to_sw_matrix = load_json(pin_map_path)
+    normalized = validate_and_normalize_config(config, pin_to_sw_matrix)
 
-    _write_bitstream(bitstream, output_path, order, m2k)
-    extra_rows = 1 if m2k else 0
-    print(
-        f"Bitstream saved to {output_path} ({len(bitstream) + extra_rows} bits, order={order})"
+    bitstream = build_bitstream(
+        normalized["connections"],
+        normalized["sizes"],
+        pin_to_sw_matrix,
     )
 
+    write_bitstream_text(output_path, bitstream, order=order, m2k=m2k)
+    extra_rows = 1 if m2k else 0
+    print("Bitstream saved to {} ({} bits, order={})".format(output_path, len(bitstream) + extra_rows, order))
+
     if csv_path:
-        header, rows = _build_csv_table(connections, pin_name_to_number)
+        pin_name_to_number = load_json(pin_name_to_number_path)
+        header, rows = _build_csv_table(normalized["connections"], pin_name_to_number)
         _write_csv(csv_path, header, rows)
-        print(f"CSV saved to {csv_path} ({len(rows)} rows)")
+        print("CSV saved to {} ({} rows)".format(csv_path, len(rows)))
 
 
 if __name__ == "__main__":
