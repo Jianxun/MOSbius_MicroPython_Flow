@@ -1,2 +1,3 @@
 .DS_Store
 bitstream.csv
+__pycache__/
