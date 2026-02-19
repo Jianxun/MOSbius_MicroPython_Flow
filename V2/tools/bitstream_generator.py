@@ -1,14 +1,40 @@
 import os
 import sys
+import json
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 LIB_DIR = os.path.join(os.path.dirname(BASE_DIR), "lib")
 sys.path.insert(0, LIB_DIR)
 
 from bitstream_builder import build_bitstream
-from config_io import load_json, write_bitstream_text
 from config_validation import validate_and_normalize_config
-from connection_semantics import normalize_sbus_mode_for_csv
+
+
+def _load_json(path):
+    with open(path, "r") as f:
+        return json.load(f)
+
+
+def _write_bitstream_text(path, bitstream, order="asc", m2k=False):
+    if order not in ("asc", "desc"):
+        raise ValueError("order must be 'asc' or 'desc'")
+    iterable = reversed(bitstream) if order == "desc" else bitstream
+    with open(path, "w") as f:
+        if m2k:
+            f.write("0\n")
+        for bit in iterable:
+            f.write("{}\n".format(int(bit)))
+
+
+def _normalize_sbus_mode_for_csv(mode):
+    mode = (mode or "OFF").upper()
+    if mode == "PHI1":
+        return "PH1"
+    if mode == "PHI2":
+        return "PH2"
+    if mode in ("ON", "OFF"):
+        return mode
+    return "OFF"
 
 
 def _bus_sort_key(bus):
@@ -52,7 +78,7 @@ def _build_csv_table(connections, pin_name_to_number):
             terminal = entry["terminal"]
             connection = entry["connection"]
             pins.add(terminal)
-            sbus_modes[bus][terminal] = normalize_sbus_mode_for_csv(connection)
+            sbus_modes[bus][terminal] = _normalize_sbus_mode_for_csv(connection)
 
     def _pin_sort_key(pin_name):
         pin_num = pin_name_to_number.get(pin_name)
@@ -153,8 +179,8 @@ def main():
     pin_map_path = os.path.join(runtime_mapping_dir, "pin_name_to_sw_matrix_pin_number.json")
     pin_name_to_number_path = os.path.join(mapping_dir, "pin_name_to_number.json")
 
-    config = load_json(config_path)
-    pin_to_sw_matrix = load_json(pin_map_path)
+    config = _load_json(config_path)
+    pin_to_sw_matrix = _load_json(pin_map_path)
     normalized = validate_and_normalize_config(config, pin_to_sw_matrix)
 
     bitstream = build_bitstream(
@@ -164,12 +190,12 @@ def main():
         track_sources=True,
     )
 
-    write_bitstream_text(output_path, bitstream, order=order, m2k=m2k)
+    _write_bitstream_text(output_path, bitstream, order=order, m2k=m2k)
     extra_rows = 1 if m2k else 0
     print("Bitstream saved to {} ({} bits, order={})".format(output_path, len(bitstream) + extra_rows, order))
 
     if csv_path:
-        pin_name_to_number = load_json(pin_name_to_number_path)
+        pin_name_to_number = _load_json(pin_name_to_number_path)
         header, rows = _build_csv_table(normalized["connections"], pin_name_to_number)
         _write_csv(csv_path, header, rows)
         print("CSV saved to {} ({} rows)".format(csv_path, len(rows)))

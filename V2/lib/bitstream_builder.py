@@ -1,6 +1,19 @@
 import register_map_equations as reg_eq
-from connection_semantics import sbus_mode_to_pair
-from settings import EXPECTED_BITS
+
+EXPECTED_BITS = 2008
+
+
+def _sbus_mode_to_pair(mode):
+    mode = (mode or "OFF").upper()
+    if mode == "ON":
+        return 1, 1
+    if mode == "PHI1":
+        return 1, 0
+    if mode == "PHI2":
+        return 0, 1
+    if mode == "OFF":
+        return 0, 0
+    raise ValueError("Invalid SBUS mode '{}'".format(mode))
 
 
 def _set_bit(bitstream, register, value, source, set_sources):
@@ -41,7 +54,7 @@ def build_bitstream(connections, sizes, pin_to_sw_matrix, track_sources=False):
 
                 if has_suffix:
                     register = reg_eq.sbus_register(sw_pin, bus)
-                    a, b = sbus_mode_to_pair(connection)
+                    a, b = _sbus_mode_to_pair(connection)
                     value = a if bus.endswith("a") else b
                     _set_bit(
                         bitstream,
@@ -54,7 +67,7 @@ def build_bitstream(connections, sizes, pin_to_sw_matrix, track_sources=False):
 
                 reg_a = reg_eq.sbus_register(sw_pin, "{}a".format(bus))
                 reg_b = reg_eq.sbus_register(sw_pin, "{}b".format(bus))
-                a, b = sbus_mode_to_pair(connection)
+                a, b = _sbus_mode_to_pair(connection)
                 _set_bit(
                     bitstream,
                     reg_a,

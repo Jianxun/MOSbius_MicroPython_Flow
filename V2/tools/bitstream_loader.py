@@ -1,18 +1,56 @@
 import os
 import sys
+import time
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 LIB_DIR = os.path.join(os.path.dirname(BASE_DIR), "lib")
 sys.path.insert(0, LIB_DIR)
 
-from config_io import load_bitstream_text
-from programmer import program_bitstream
-from settings import EXPECTED_BITS
+from bitstream_builder import EXPECTED_BITS
 
 DEFAULT_PIN_EN = 18
 DEFAULT_PIN_CLK = 17
 DEFAULT_PIN_DATA = 16
 DEFAULT_T_CLK_HALF_CYCLE_US = 10
+
+
+def _load_bitstream_text(path):
+    bits = []
+    with open(path, "r") as f:
+        for line_no, raw_line in enumerate(f, 1):
+            line = raw_line.strip()
+            if not line:
+                continue
+            if line not in ("0", "1"):
+                raise ValueError(
+                    "Invalid bitstream value '{}' at line {} in {}".format(
+                        line, line_no, path
+                    )
+                )
+            bits.append(1 if line == "1" else 0)
+    if not bits:
+        raise ValueError("Bitstream file is empty: {}".format(path))
+    return bits
+
+
+def _program_bitstream(bitstream, pin_en, pin_clk, pin_data, t_clk_half_cycle_us):
+    if pin_en is None or pin_clk is None or pin_data is None:
+        raise ValueError("GPIO pins are not initialized")
+    if not bitstream:
+        raise ValueError("Bitstream is empty")
+
+    pin_data.value(0)
+    pin_clk.value(0)
+    pin_en.value(0)
+
+    for bit in reversed(bitstream):
+        pin_data.value(bit)
+        pin_clk.value(1)
+        time.sleep_us(t_clk_half_cycle_us)
+        pin_clk.value(0)
+        time.sleep_us(t_clk_half_cycle_us)
+
+    pin_en.value(1)
 
 
 def _default_bitstream_path():
@@ -77,7 +115,7 @@ def main():
     if filename is None:
         filename = _default_bitstream_path()
 
-    bitstream = load_bitstream_text(filename)
+    bitstream = _load_bitstream_text(filename)
     if len(bitstream) != EXPECTED_BITS:
         print(
             "Warning: expected {} bits, loaded {} bits from {}".format(
@@ -96,7 +134,7 @@ def main():
     pin_en = Pin(pin_en_num, Pin.OUT)
     pin_clk = Pin(pin_clk_num, Pin.OUT)
     pin_data = Pin(pin_data_num, Pin.OUT)
-    program_bitstream(
+    _program_bitstream(
         bitstream,
         pin_en,
         pin_clk,

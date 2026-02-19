@@ -1,5 +1,16 @@
 import register_map_equations as reg_eq
-from connection_semantics import VALID_SBUS_MODES, parse_terminal_and_mode
+
+VALID_SBUS_MODES = ("ON", "OFF", "PHI1", "PHI2")
+
+
+def _parse_terminal_and_mode(value):
+    if "@" not in value:
+        return value, None, False
+    terminal, mode = value.rsplit("@", 1)
+    mode = mode.strip().upper()
+    if mode not in VALID_SBUS_MODES:
+        raise ValueError("SBUS: unknown suffix '{}' in '{}'".format(mode, value))
+    return terminal, mode, True
 
 
 def _normalize_size_value(device, raw):
@@ -22,14 +33,14 @@ def _normalize_size_value(device, raw):
 
 def _parse_sbus_entry(entry, path):
     if isinstance(entry, str):
-        terminal, parsed_mode, _ = parse_terminal_and_mode(entry)
+        terminal, parsed_mode, _ = _parse_terminal_and_mode(entry)
         return {"terminal": terminal, "connection": parsed_mode or "ON"}
 
     if isinstance(entry, dict):
         terminal = entry.get("terminal")
         if terminal is None:
             raise ValueError("{} missing required field 'terminal'".format(path))
-        terminal, parsed_mode, had_suffix = parse_terminal_and_mode(terminal)
+        terminal, parsed_mode, had_suffix = _parse_terminal_and_mode(terminal)
         connection = entry.get("connection", "OFF")
         connection = str(connection).upper()
         if had_suffix:
