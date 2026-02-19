@@ -2,6 +2,8 @@ import json
 import os
 import sys
 
+import register_map_equations as reg_eq
+
 MAX_REGISTER = 2008
 
 
@@ -145,7 +147,7 @@ def _write_csv(output_path, header, rows):
             f.write(",".join(row) + "\n")
 
 
-def _apply_connections(bitstream, connections, pin_to_sw_matrix, sw_matrix_to_register, set_sources):
+def _apply_connections(bitstream, connections, pin_to_sw_matrix, set_sources):
     for bus, entries in connections.items():
         if bus.startswith("RBUS"):
             for pin in entries:
@@ -153,13 +155,12 @@ def _apply_connections(bitstream, connections, pin_to_sw_matrix, sw_matrix_to_re
                 if sw_matrix_pin is None:
                     _warn(f"RBUS: pin '{pin}' not found in pin-to-switch map")
                     continue
-                if not isinstance(sw_matrix_pin, str):
-                    sw_matrix_pin = str(int(sw_matrix_pin))
-                register = sw_matrix_to_register.get(sw_matrix_pin, {}).get(bus)
-                if register is None:
-                    _warn(f"RBUS: register not found for sw_pin '{sw_matrix_pin}' bus '{bus}'")
+                try:
+                    register = reg_eq.rbus_register(sw_matrix_pin, bus)
+                except ValueError as exc:
+                    _warn(f"RBUS: {exc}")
                     continue
-                _set_bit(bitstream, int(register), 1, f"RBUS {bus} pin {pin}", set_sources)
+                _set_bit(bitstream, register, 1, f"RBUS {bus} pin {pin}", set_sources)
         elif bus.startswith("SBUS"):
             has_suffix = bus[-1:] in ("a", "b")
             for entry in entries:
@@ -188,13 +189,12 @@ def _apply_connections(bitstream, connections, pin_to_sw_matrix, sw_matrix_to_re
                 if sw_matrix_pin is None:
                     _warn(f"SBUS: terminal '{terminal}' not found in pin-to-switch map")
                     continue
-                if not isinstance(sw_matrix_pin, str):
-                    sw_matrix_pin = str(int(sw_matrix_pin))
 
                 if has_suffix:
-                    register = sw_matrix_to_register.get(sw_matrix_pin, {}).get(bus)
-                    if register is None:
-                        _warn(f"SBUS: register not found for sw_pin '{sw_matrix_pin}' bus '{bus}'")
+                    try:
+                        register = reg_eq.sbus_register(sw_matrix_pin, bus)
+                    except ValueError as exc:
+                        _warn(f"SBUS: {exc}")
                         continue
                     if connection in ("ON", "OFF"):
                         value = 1 if connection == "ON" else 0
@@ -206,7 +206,7 @@ def _apply_connections(bitstream, connections, pin_to_sw_matrix, sw_matrix_to_re
                         value = 0
                     _set_bit(
                         bitstream,
-                        int(register),
+                        register,
                         value,
                         f"SBUS {bus} {terminal} {connection}",
                         set_sources,
@@ -215,10 +215,11 @@ def _apply_connections(bitstream, connections, pin_to_sw_matrix, sw_matrix_to_re
 
                 sbus_a = f"{bus}a"
                 sbus_b = f"{bus}b"
-                register_a = sw_matrix_to_register.get(sw_matrix_pin, {}).get(sbus_a)
-                register_b = sw_matrix_to_register.get(sw_matrix_pin, {}).get(sbus_b)
-                if register_a is None or register_b is None:
-                    _warn(f"SBUS: register not found for sw_pin '{sw_matrix_pin}' buses '{sbus_a}/{sbus_b}'")
+                try:
+                    register_a = reg_eq.sbus_register(sw_matrix_pin, sbus_a)
+                    register_b = reg_eq.sbus_register(sw_matrix_pin, sbus_b)
+                except ValueError as exc:
+                    _warn(f"SBUS: {exc}")
                     continue
 
                 if connection == "ON":
@@ -232,14 +233,14 @@ def _apply_connections(bitstream, connections, pin_to_sw_matrix, sw_matrix_to_re
 
                 _set_bit(
                     bitstream,
-                    int(register_a),
+                    register_a,
                     a_value,
                     f"SBUS {bus} {terminal} {connection}",
                     set_sources,
                 )
                 _set_bit(
                     bitstream,
-                    int(register_b),
+                    register_b,
                     b_value,
                     f"SBUS {bus} {terminal} {connection}",
                     set_sources,
@@ -248,15 +249,33 @@ def _apply_connections(bitstream, connections, pin_to_sw_matrix, sw_matrix_to_re
             _warn(f"Unknown bus '{bus}' (expected RBUS/SBUS)")
 
 
-def _apply_sizes(bitstream, sizes, device_to_registers, set_sources):
-    for device, bit_to_register in device_to_registers.items():
-        size = sizes.get(device, [0])[0]
+def _normalize_size_value(device, raw):
+    if isinstance(raw, list):
+        if len(raw) != 1:
+            _warn(f"sizes {device}: list must contain exactly one value; defaulting to 0")
+            return 0
+        raw = raw[0]
+    try:
+        return int(raw)
+    except (TypeError, ValueError):
+        _warn(f"sizes {device}: invalid value {raw!r}; defaulting to 0")
+        return 0
+
+
+def _apply_sizes(bitstream, sizes, set_sources):
+    known_devices = set(reg_eq.SIZING_DEVICE_ORDER)
+    for device in sorted(set(sizes.keys()) - known_devices):
+        _warn(f"sizes: unknown device '{device}' (ignored)")
+
+    for device in reg_eq.SIZING_DEVICE_ORDER:
+        size = _normalize_size_value(device, sizes.get(device, 0))
         if not (0 <= size <= 31):
             _warn(f"size {size} for device {device} is not 5-bit; defaulting to 0")
             size = 0
-        for bit, register in sorted(bit_to_register.items(), key=lambda x: int(x[0])):
-            value = 1 if int(bit) & size else 0
-            _set_bit(bitstream, int(register), value, f"sizes {device} bit {bit}", set_sources)
+        for bit in (1, 2, 4, 8, 16):
+            register = reg_eq.sizing_register(device, bit)
+            value = 1 if bit & size else 0
+            _set_bit(bitstream, register, value, f"sizes {device} bit {bit}", set_sources)
 
 
 def _write_bitstream(bitstream, output_path, order, m2k):
@@ -332,25 +351,21 @@ def main():
 
     mapping_dir = os.path.join(base_dir, "chip_config_data")
     pin_map_path = os.path.join(mapping_dir, "pin_name_to_sw_matrix_pin_number.json")
-    register_map_path = os.path.join(mapping_dir, "switch_matrix_register_map.json")
-    sizes_map_path = os.path.join(mapping_dir, "device_name_to_sizing_registers.json")
 
     config = _load_json(config_path)
     connections = config.get("connections", config if isinstance(config, dict) else {})
     sizes = config.get("sizes", {})
 
     pin_to_sw_matrix = _load_json(pin_map_path)
-    sw_matrix_to_register = _load_json(register_map_path)
-    device_to_registers = _load_json(sizes_map_path)
     pin_name_to_number_path = os.path.join(mapping_dir, "pin_name_to_number.json")
     pin_name_to_number = _load_json(pin_name_to_number_path)
 
     bitstream = [0] * MAX_REGISTER
     set_sources = [None] * MAX_REGISTER
     if connections:
-        _apply_connections(bitstream, connections, pin_to_sw_matrix, sw_matrix_to_register, set_sources)
+        _apply_connections(bitstream, connections, pin_to_sw_matrix, set_sources)
     if sizes:
-        _apply_sizes(bitstream, sizes, device_to_registers, set_sources)
+        _apply_sizes(bitstream, sizes, set_sources)
 
     _write_bitstream(bitstream, output_path, order, m2k)
     extra_rows = 1 if m2k else 0
