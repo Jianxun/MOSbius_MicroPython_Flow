@@ -1,4 +1,3 @@
-import os
 import sys
 import json
 import time
@@ -9,9 +8,37 @@ from config_validation import validate_and_normalize_config
 DEBUG_BITSTREAM_FILENAME = "bitstream.txt"
 
 
+def _dirname(path):
+    if not path:
+        return "."
+    if "/" not in path:
+        return "."
+    head = path.rsplit("/", 1)[0]
+    return head if head else "/"
+
+
+def _join(a, b):
+    if not a or a == ".":
+        return b
+    if a.endswith("/"):
+        return a + b
+    return a + "/" + b
+
+
+def _isabs(path):
+    return isinstance(path, str) and path.startswith("/")
+
+
 def _load_json(path):
-    with open(path, "r") as f:
-        return json.load(f)
+    try:
+        with open(path, "r") as f:
+            return json.load(f)
+    except OSError as e:
+        if e.args and e.args[0] == 2:
+            raise OSError(
+                "{} (file not found; verify this file exists on Pico root and name matches exactly)".format(path)
+            )
+        raise
 
 
 def _write_bitstream_text(path, bitstream, order="asc", m2k=False):
@@ -68,23 +95,24 @@ class MOSbiusV2Driver:
 
     @staticmethod
     def _base_dir():
-        if "__file__" in globals():
-            return os.path.dirname(os.path.abspath(__file__))
+        file_path = globals().get("__file__", "")
+        if file_path:
+            return _dirname(file_path)
         return "."
 
     @classmethod
     def _default_pin_map_path(cls):
-        return os.path.join(cls._base_dir(), "chip_config_data", "pin_name_to_sw_matrix_pin_number.json")
+        return _join(cls._base_dir(), "pin_name_to_sw_matrix_pin_number.json")
 
     @classmethod
     def _resolve_local_path(cls, path):
-        if os.path.isabs(path):
+        if _isabs(path):
             return path
-        return os.path.join(cls._project_dir(), path)
+        return _join(cls._project_dir(), path)
 
     @classmethod
     def _project_dir(cls):
-        return os.path.dirname(cls._base_dir())
+        return _dirname(cls._base_dir())
 
     def build_bitstream_from_config(self):
         config = _load_json(self.config_path)
@@ -102,7 +130,7 @@ class MOSbiusV2Driver:
         bitstream = self.build_bitstream_from_config()
 
         if self.write_debug_bitstream:
-            debug_path = os.path.join(self._base_dir(), DEBUG_BITSTREAM_FILENAME)
+            debug_path = _join(self._base_dir(), DEBUG_BITSTREAM_FILENAME)
             _write_bitstream_text(debug_path, bitstream, order="asc", m2k=False)
 
         if sys.implementation.name != "micropython":

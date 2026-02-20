@@ -175,8 +175,7 @@ def main():
     config_path, output_path, order, csv_path, m2k = _parse_args(sys.argv, default_config, default_output)
 
     mapping_dir = os.path.join(base_dir, "chip_config_data")
-    runtime_mapping_dir = os.path.join(LIB_DIR, "chip_config_data")
-    pin_map_path = os.path.join(runtime_mapping_dir, "pin_name_to_sw_matrix_pin_number.json")
+    pin_map_path = os.path.join(LIB_DIR, "pin_name_to_sw_matrix_pin_number.json")
     pin_name_to_number_path = os.path.join(mapping_dir, "pin_name_to_number.json")
 
     config = _load_json(config_path)

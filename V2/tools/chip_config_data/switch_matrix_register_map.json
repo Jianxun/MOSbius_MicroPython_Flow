@@ -158,7 +158,7 @@
         "RBUS6": "410",
         "RBUS7": "433",
         "RBUS8": "456",
-        "display_name": "DCC3_N_G_L_CC"
+        "display_name": "DCC3_N_L_G_CC"
     },
     "8": {
         "SBUS1a": "15",
@@ -181,7 +181,7 @@
         "RBUS6": "411",
         "RBUS7": "434",
         "RBUS8": "457",
-        "display_name": "DCC3_N_G_L_CS"
+        "display_name": "DCC3_N_L_G_CS"
     },
     "9": {
         "SBUS1a": "17",
@@ -204,7 +204,7 @@
         "RBUS6": "412",
         "RBUS7": "435",
         "RBUS8": "458",
-        "display_name": "DCC3_N_G_R_CC"
+        "display_name": "DCC3_N_R_G_CC"
     },
     "10": {
         "SBUS1a": "19",
@@ -227,7 +227,7 @@
         "RBUS6": "413",
         "RBUS7": "436",
         "RBUS8": "459",
-        "display_name": "DCC3_N_G_R_CS"
+        "display_name": "DCC3_N_R_G_CS"
     },
     "11": {
         "SBUS1a": "21",
@@ -250,7 +250,7 @@
         "RBUS6": "414",
         "RBUS7": "437",
         "RBUS8": "460",
-        "display_name": "DCC3_N_D_L_CC"
+        "display_name": "DCC3_N_L_D_CC"
     },
     "12": {
         "SBUS1a": "23",
@@ -273,7 +273,7 @@
         "RBUS6": "415",
         "RBUS7": "438",
         "RBUS8": "461",
-        "display_name": "DCC3_N_D_L_CS"
+        "display_name": "DCC3_N_L_D_CS"
     },
     "13": {
         "SBUS1a": "25",
@@ -296,7 +296,7 @@
         "RBUS6": "416",
         "RBUS7": "439",
         "RBUS8": "462",
-        "display_name": "DCC3_N_D_R_CC"
+        "display_name": "DCC3_N_R_D_CC"
     },
     "14": {
         "SBUS1a": "27",
@@ -319,7 +319,7 @@
         "RBUS6": "417",
         "RBUS7": "440",
         "RBUS8": "463",
-        "display_name": "DCC3_N_D_R_CS"
+        "display_name": "DCC3_N_R_D_CS"
     },
     "15": {
         "SBUS1a": "29",
@@ -342,7 +342,7 @@
         "RBUS6": "418",
         "RBUS7": "441",
         "RBUS8": "464",
-        "display_name": "DCC4_N_G_L_CC"
+        "display_name": "DCC4_N_L_G_CC"
     },
     "16": {
         "SBUS1a": "31",
@@ -365,7 +365,7 @@
         "RBUS6": "419",
         "RBUS7": "442",
         "RBUS8": "465",
-        "display_name": "DCC4_N_G_L_CS"
+        "display_name": "DCC4_N_L_G_CS"
     },
     "17": {
         "SBUS1a": "33",
@@ -388,7 +388,7 @@
         "RBUS6": "420",
         "RBUS7": "443",
         "RBUS8": "466",
-        "display_name": "DCC4_N_G_R_CC"
+        "display_name": "DCC4_N_R_G_CC"
     },
     "18": {
         "SBUS1a": "35",
@@ -411,7 +411,7 @@
         "RBUS6": "421",
         "RBUS7": "444",
         "RBUS8": "467",
-        "display_name": "DCC4_N_G_R_CS"
+        "display_name": "DCC4_N_R_G_CS"
     },
     "19": {
         "SBUS1a": "37",
@@ -434,7 +434,7 @@
         "RBUS6": "422",
         "RBUS7": "445",
         "RBUS8": "468",
-        "display_name": "DCC4_N_D_L_CC"
+        "display_name": "DCC4_N_L_D_CC"
     },
     "20": {
         "SBUS1a": "39",
@@ -457,7 +457,7 @@
         "RBUS6": "423",
         "RBUS7": "446",
         "RBUS8": "469",
-        "display_name": "DCC4_N_D_L_CS"
+        "display_name": "DCC4_N_L_D_CS"
     },
     "21": {
         "SBUS1a": "41",
@@ -480,7 +480,7 @@
         "RBUS6": "424",
         "RBUS7": "447",
         "RBUS8": "470",
-        "display_name": "DCC4_N_D_R_CC"
+        "display_name": "DCC4_N_R_D_CC"
     },
     "22": {
         "SBUS1a": "43",
@@ -503,7 +503,7 @@
         "RBUS6": "425",
         "RBUS7": "448",
         "RBUS8": "471",
-        "display_name": "DCC4_N_D_R_CS"
+        "display_name": "DCC4_N_R_D_CS"
     },
     "23": {
         "SBUS1a": "45",
@@ -526,7 +526,7 @@
         "RBUS6": "426",
         "RBUS7": "449",
         "RBUS8": "472",
-        "display_name": "DCC2_N_G_L_CC"
+        "display_name": "DCC2_N_L_G_CC"
     },
     "internal_A": {
         "SBUS1a": "47",
@@ -563,7 +563,7 @@
         "RBUS6": "876",
         "RBUS7": "899",
         "RBUS8": "922",
-        "display_name": "DCC2_N_G_L_CS"
+        "display_name": "DCC2_N_L_G_CS"
     },
     "25": {
         "SBUS1a": "475",
@@ -586,7 +586,7 @@
         "RBUS6": "877",
         "RBUS7": "900",
         "RBUS8": "923",
-        "display_name": "DCC2_N_G_R_CC"
+        "display_name": "DCC2_N_R_G_CC"
     },
     "26": {
         "SBUS1a": "477",
@@ -609,7 +609,7 @@
         "RBUS6": "878",
         "RBUS7": "901",
         "RBUS8": "924",
-        "display_name": "DCC2_N_G_R_CS"
+        "display_name": "DCC2_N_R_G_CS"
     },
     "27": {
         "SBUS1a": "479",
@@ -632,7 +632,7 @@
         "RBUS6": "879",
         "RBUS7": "902",
         "RBUS8": "925",
-        "display_name": "DCC2_N_D_L_CC"
+        "display_name": "DCC2_N_L_D_CC"
     },
     "28": {
         "SBUS1a": "481",
@@ -655,7 +655,7 @@
         "RBUS6": "880",
         "RBUS7": "903",
         "RBUS8": "926",
-        "display_name": "DCC2_N_D_L_CS"
+        "display_name": "DCC2_N_L_D_CS"
     },
     "29": {
         "SBUS1a": "483",
@@ -678,7 +678,7 @@
         "RBUS6": "881",
         "RBUS7": "904",
         "RBUS8": "927",
-        "display_name": "DCC2_N_D_R_CC"
+        "display_name": "DCC2_N_R_D_CC"
     },
     "30": {
         "SBUS1a": "485",
@@ -701,7 +701,7 @@
         "RBUS6": "882",
         "RBUS7": "905",
         "RBUS8": "928",
-        "display_name": "DCC2_N_D_R_CS"
+        "display_name": "DCC2_N_R_D_CS"
     },
     "31": {
         "SBUS1a": "487",
@@ -724,7 +724,7 @@
         "RBUS6": "883",
         "RBUS7": "906",
         "RBUS8": "929",
-        "display_name": "DCC1_N_G_L_CC"
+        "display_name": "DCC1_N_L_G_CC"
     },
     "32": {
         "SBUS1a": "489",
@@ -747,7 +747,7 @@
         "RBUS6": "884",
         "RBUS7": "907",
         "RBUS8": "930",
-        "display_name": "DCC1_N_G_L_CS"
+        "display_name": "DCC1_N_L_G_CS"
     },
     "33": {
         "SBUS1a": "491",
@@ -770,7 +770,7 @@
         "RBUS6": "885",
         "RBUS7": "908",
         "RBUS8": "931",
-        "display_name": "DCC1_N_G_R_CC"
+        "display_name": "DCC1_N_R_G_CC"
     },
     "34": {
         "SBUS1a": "493",
@@ -793,7 +793,7 @@
         "RBUS6": "886",
         "RBUS7": "909",
         "RBUS8": "932",
-        "display_name": "DCC1_N_G_R_CS"
+        "display_name": "DCC1_N_R_G_CS"
     },
     "35": {
         "SBUS1a": "495",
@@ -816,7 +816,7 @@
         "RBUS6": "887",
         "RBUS7": "910",
         "RBUS8": "933",
-        "display_name": "DCC1_N_D_L_CC"
+        "display_name": "DCC1_N_L_D_CC"
     },
     "36": {
         "SBUS1a": "497",
@@ -839,7 +839,7 @@
         "RBUS6": "888",
         "RBUS7": "911",
         "RBUS8": "934",
-        "display_name": "DCC1_N_D_L_CS"
+        "display_name": "DCC1_N_L_D_CS"
     },
     "37": {
         "SBUS1a": "499",
@@ -862,7 +862,7 @@
         "RBUS6": "889",
         "RBUS7": "912",
         "RBUS8": "935",
-        "display_name": "DCC1_N_D_R_CC"
+        "display_name": "DCC1_N_R_D_CC"
     },
     "38": {
         "SBUS1a": "501",
@@ -885,7 +885,7 @@
         "RBUS6": "890",
         "RBUS7": "913",
         "RBUS8": "936",
-        "display_name": "DCC1_N_D_R_CS"
+        "display_name": "DCC1_N_R_D_CS"
     },
     "39": {
         "SBUS1a": "503",
@@ -1382,7 +1382,7 @@
         "RBUS6": "1360",
         "RBUS7": "1383",
         "RBUS8": "1406",
-        "display_name": "DCC3_P_G_L_CS"
+        "display_name": "DCC3_P_L_G_CS"
     },
     "60": {
         "SBUS1a": "971",
@@ -1405,7 +1405,7 @@
         "RBUS6": "1361",
         "RBUS7": "1384",
         "RBUS8": "1407",
-        "display_name": "DCC3_P_G_L_CC"
+        "display_name": "DCC3_P_L_G_CC"
     },
     "61": {
         "SBUS1a": "973",
@@ -1428,7 +1428,7 @@
         "RBUS6": "1362",
         "RBUS7": "1385",
         "RBUS8": "1408",
-        "display_name": "DCC3_P_G_R_CS"
+        "display_name": "DCC3_P_R_G_CS"
     },
     "62": {
         "SBUS1a": "975",
@@ -1451,7 +1451,7 @@
         "RBUS6": "1363",
         "RBUS7": "1386",
         "RBUS8": "1409",
-        "display_name": "DCC3_P_G_R_CC"
+        "display_name": "DCC3_P_R_G_CC"
     },
     "63": {
         "SBUS1a": "977",
@@ -1474,7 +1474,7 @@
         "RBUS6": "1364",
         "RBUS7": "1387",
         "RBUS8": "1410",
-        "display_name": "DCC3_P_D_L_CS"
+        "display_name": "DCC3_P_L_D_CS"
     },
     "64": {
         "SBUS1a": "979",
@@ -1497,7 +1497,7 @@
         "RBUS6": "1365",
         "RBUS7": "1388",
         "RBUS8": "1411",
-        "display_name": "DCC3_P_D_L_CC"
+        "display_name": "DCC3_P_L_D_CC"
     },
     "65": {
         "SBUS1a": "981",
@@ -1520,7 +1520,7 @@
         "RBUS6": "1366",
         "RBUS7": "1389",
         "RBUS8": "1412",
-        "display_name": "DCC3_P_D_R_CS"
+        "display_name": "DCC3_P_R_D_CS"
     },
     "66": {
         "SBUS1a": "983",
@@ -1543,7 +1543,7 @@
         "RBUS6": "1367",
         "RBUS7": "1390",
         "RBUS8": "1413",
-        "display_name": "DCC3_P_D_R_CC"
+        "display_name": "DCC3_P_R_D_CC"
     },
     "67": {
         "SBUS1a": "985",
@@ -1566,7 +1566,7 @@
         "RBUS6": "1368",
         "RBUS7": "1391",
         "RBUS8": "1414",
-        "display_name": "DCC2_P_G_L_CS"
+        "display_name": "DCC2_P_L_G_CS"
     },
     "68": {
         "SBUS1a": "987",
@@ -1589,7 +1589,7 @@
         "RBUS6": "1369",
         "RBUS7": "1392",
         "RBUS8": "1415",
-        "display_name": "DCC2_P_G_L_CC"
+        "display_name": "DCC2_P_L_G_CC"
     },
     "69": {
         "SBUS1a": "989",
@@ -1612,7 +1612,7 @@
         "RBUS6": "1370",
         "RBUS7": "1393",
         "RBUS8": "1416",
-        "display_name": "DCC2_P_G_R_CS"
+        "display_name": "DCC2_P_R_G_CS"
     },
     "internal_C": {
         "SBUS1a": "991",
@@ -1649,7 +1649,7 @@
         "RBUS6": "1820",
         "RBUS7": "1843",
         "RBUS8": "1866",
-        "display_name": "DCC2_P_G_R_CC"
+        "display_name": "DCC2_P_R_G_CC"
     },
     "71": {
         "SBUS1a": "1419",
@@ -1672,7 +1672,7 @@
         "RBUS6": "1821",
         "RBUS7": "1844",
         "RBUS8": "1867",
-        "display_name": "DCC2_P_D_L_CS"
+        "display_name": "DCC2_P_L_D_CS"
     },
     "72": {
         "SBUS1a": "1421",
@@ -1695,7 +1695,7 @@
         "RBUS6": "1822",
         "RBUS7": "1845",
         "RBUS8": "1868",
-        "display_name": "DCC2_P_D_L_CC"
+        "display_name": "DCC2_P_L_D_CC"
     },
     "73": {
         "SBUS1a": "1423",
@@ -1718,7 +1718,7 @@
         "RBUS6": "1823",
         "RBUS7": "1846",
         "RBUS8": "1869",
-        "display_name": "DCC2_P_D_R_CS"
+        "display_name": "DCC2_P_R_D_CS"
     },
     "74": {
         "SBUS1a": "1425",
@@ -1741,7 +1741,7 @@
         "RBUS6": "1824",
         "RBUS7": "1847",
         "RBUS8": "1870",
-        "display_name": "DCC2_P_D_R_CC"
+        "display_name": "DCC2_P_R_D_CC"
     },
     "75": {
         "SBUS1a": "1427",
@@ -1764,7 +1764,7 @@
         "RBUS6": "1825",
         "RBUS7": "1848",
         "RBUS8": "1871",
-        "display_name": "DCC1_P_G_L_CS"
+        "display_name": "DCC1_P_L_G_CS"
     },
     "76": {
         "SBUS1a": "1429",
@@ -1787,7 +1787,7 @@
         "RBUS6": "1826",
         "RBUS7": "1849",
         "RBUS8": "1872",
-        "display_name": "DCC1_P_G_L_CC"
+        "display_name": "DCC1_P_L_G_CC"
     },
     "77": {
         "SBUS1a": "1431",
@@ -1810,7 +1810,7 @@
         "RBUS6": "1827",
         "RBUS7": "1850",
         "RBUS8": "1873",
-        "display_name": "DCC1_P_G_R_CS"
+        "display_name": "DCC1_P_R_G_CS"
     },
     "78": {
         "SBUS1a": "1433",
@@ -1833,7 +1833,7 @@
         "RBUS6": "1828",
         "RBUS7": "1851",
         "RBUS8": "1874",
-        "display_name": "DCC1_P_G_R_CC"
+        "display_name": "DCC1_P_R_G_CC"
     },
     "79": {
         "SBUS1a": "1435",
@@ -1856,7 +1856,7 @@
         "RBUS6": "1829",
         "RBUS7": "1852",
         "RBUS8": "1875",
-        "display_name": "DCC1_P_D_L_CS"
+        "display_name": "DCC1_P_L_D_CS"
     },
     "80": {
         "SBUS1a": "1437",
@@ -1879,7 +1879,7 @@
         "RBUS6": "1830",
         "RBUS7": "1853",
         "RBUS8": "1876",
-        "display_name": "DCC1_P_D_L_CC"
+        "display_name": "DCC1_P_L_D_CC"
     },
     "81": {
         "SBUS1a": "1439",
@@ -1902,7 +1902,7 @@
         "RBUS6": "1831",
         "RBUS7": "1854",
         "RBUS8": "1877",
-        "display_name": "DCC1_P_D_R_CS"
+        "display_name": "DCC1_P_R_D_CS"
     },
     "82": {
         "SBUS1a": "1441",
@@ -1925,7 +1925,7 @@
         "RBUS6": "1832",
         "RBUS7": "1855",
         "RBUS8": "1878",
-        "display_name": "DCC1_P_D_R_CC"
+        "display_name": "DCC1_P_R_D_CC"
     },
     "83": {
         "SBUS1a": "1443",
@@ -1948,7 +1948,7 @@
         "RBUS6": "1833",
         "RBUS7": "1856",
         "RBUS8": "1879",
-        "display_name": "DCC4_P_G_L_CS"
+        "display_name": "DCC4_P_L_G_CS"
     },
     "84": {
         "SBUS1a": "1445",
@@ -1971,7 +1971,7 @@
         "RBUS6": "1834",
         "RBUS7": "1857",
         "RBUS8": "1880",
-        "display_name": "DCC4_P_G_L_CC"
+        "display_name": "DCC4_P_L_G_CC"
     },
     "85": {
         "SBUS1a": "1447",
@@ -1994,7 +1994,7 @@
         "RBUS6": "1835",
         "RBUS7": "1858",
         "RBUS8": "1881",
-        "display_name": "DCC4_P_G_R_CS"
+        "display_name": "DCC4_P_R_G_CS"
     },
     "86": {
         "SBUS1a": "1449",
@@ -2017,7 +2017,7 @@
         "RBUS6": "1836",
         "RBUS7": "1859",
         "RBUS8": "1882",
-        "display_name": "DCC4_P_G_R_CC"
+        "display_name": "DCC4_P_R_G_CC"
     },
     "87": {
         "SBUS1a": "1451",
@@ -2040,7 +2040,7 @@
         "RBUS6": "1837",
         "RBUS7": "1860",
         "RBUS8": "1883",
-        "display_name": "DCC4_P_D_L_CS"
+        "display_name": "DCC4_P_L_D_CS"
     },
     "88": {
         "SBUS1a": "1453",
@@ -2063,7 +2063,7 @@
         "RBUS6": "1838",
         "RBUS7": "1861",
         "RBUS8": "1884",
-        "display_name": "DCC4_P_D_L_CC"
+        "display_name": "DCC4_P_L_D_CC"
     },
     "89": {
         "SBUS1a": "1455",
@@ -2086,7 +2086,7 @@
         "RBUS6": "1839",
         "RBUS7": "1862",
         "RBUS8": "1885",
-        "display_name": "DCC4_P_D_R_CS"
+        "display_name": "DCC4_P_R_D_CS"
     },
     "90": {
         "SBUS1a": "1457",
@@ -2109,7 +2109,7 @@
         "RBUS6": "1840",
         "RBUS7": "1863",
         "RBUS8": "1886",
-        "display_name": "DCC4_P_D_R_CC"
+        "display_name": "DCC4_P_R_D_CC"
     },
     "91": {
         "SBUS1a": "1459",

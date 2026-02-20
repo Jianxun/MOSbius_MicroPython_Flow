@@ -44,6 +44,36 @@ In this repository, `V1/` and `V2/` are source folders only. On the Pico, copy o
 3. Edit `V2/main.py` (pins/timing/config path) and run it.
 4. Optional host tools are under `V2/tools/`.
 
+## Automated Runtime Upload (Pico)
+
+Manual copy can be replaced with one command using `mpremote`.
+
+1. Install `mpremote` on your host:
+
+```bash
+pip install mpremote
+```
+
+2. Upload one flow to Pico root (`/`):
+
+```bash
+# Upload V1 runtime files as /main.py, /MOSbius.py, /connections.json
+scripts/upload_runtime.sh v1
+
+# Upload V2 runtime files as /main.py, /config.json, /lib/...
+scripts/upload_runtime.sh v2
+```
+
+Optional flags:
+
+```bash
+# Specify serial port explicitly
+scripts/upload_runtime.sh v2 --port /dev/tty.usbmodem1101
+
+# Remove known files from the other flow before upload
+scripts/upload_runtime.sh v2 --clean
+```
+
 ## Host-Side Validation (V2)
 
 From the repository root:
