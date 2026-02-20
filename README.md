@@ -1,36 +1,89 @@
-# About
-This project is the MicroPython workflow of the MOSbius chip (https://mosbius.org). 
-Any MCU platform that is capable of running MicroPython can be used to program the MOSbius but Raspberry Pi Pico is recommended.
+# MOSbius MicroPython Flow
 
-# Raspberry Pi Pico
-Follow the official tutorials and install MicroPython firmware onto the Raspberry Pi Pico.
-https://projects.raspberrypi.org/en/projects/getting-started-with-the-pico
+This repository contains two official MOSbius chip versions:
 
-# Python IDE
-You can use Thonny (https://thonny.org/), which is recommended by the official tutorial. This is beginner friendly IDE. You can easily move files between you computer and the RPi Pico.
+- `V1/`
+- `V2/`
 
-If you are a more experienced Python user, and want a nicer IDE with code completion, you can use the VSCode + MicroPico plugin.
- 
-# Upload Files
-`MOSbius.py`, `main.py`, and `connections.json` are essential files that need to be uploaded to the RPi Pico.
+`V1` and `V2` are significantly different in architecture and features. Their software toolchains and config formats are incompatible.
 
-If you are using Thonny, right click them in the files window and select `Upload to /`
-![](./screenshots/upload_files_to_rpi_pico.png)
+In this repository, `V1/` and `V2/` are source folders only. On the Pico, copy one flow at a time to the Pico root (`/`) without keeping the `V1` or `V2` parent directory name.
 
-If you are using VSCode + MicroPico, you can right click on the files and select `Upload file to Pico`, or `Upload project to Pico`.
-![](./screenshots/upload_files_to_rpi_pico_vscode.png)
+## Repository Structure
 
-# Program MOSbius with the Raspberry Pi Pico
-- Connect GPIO `10`, `11`, and `12` pins on the RPi Pico to the `EN`, `CLK` and `DATA` pins on the MOSBIUS PCB (top pins) and short the corresponding jumpers to the left. Feel free to use other GPIO pins by modifying the definitions in `main.py`.
-- Connect the `LDO` and `GND` pins on the MOSbius PCB to the Raspberry Pi GND and 3.3V power pin.
-- Below is an example setup with breadboards.
-![](./screenshots/RPi_Pico_connections.png)
+- `V1/`
+  - `main.py`: V1 entrypoint
+  - `MOSbius.py`: V1 bitstream builder/programmer class
+  - `connections.json`: V1 connection input
+  - `README.md`: V1 usage details
+- `V2/`
+  - `main.py`: V2 runtime entrypoint (Pico + desktop-safe)
+  - `config.json`: V2 runtime config
+  - `lib/`: V2 runtime internals (driver, builder, validation, equations)
+  - `tools/`: V2 host utilities (generator, loader, validators)
+  - `README.md`: V2 runtime details
+- `screenshots/`: setup and usage images
 
-- Open `connections.json` from the device, edit and save the connections as needed. The default `connection.json` is a three-stage ring oscillator.
-- Double click to open `main.py` from the device, click `Run current script`.
-- The console will print out the connections and the bitstream, check them against your `connections.json` file.
-![](./screenshots/programming_MOSbius.png)
+## Choose a Flow
 
+1. Use `V1/` only with a `V1` chip and `V1` config/tooling.
+2. Use `V2/` only with a `V2` chip and `V2` config/tooling.
 
-# Running the flow on non-MicroPython hosts
-The `main.py` script can detect if it is running on a MicroPython implementation. If not it will create the MOSbius object without valid GPIO pin configurations. You should be able to create a bitstream from a .json file and export it to `bitstream.csv`, which can be loaded into Scopy to program the MOSbius chip with an ADALM2000 if you don't have a RPI pico available.
+## Quick Start
+
+### V1
+
+1. Read `V1/README.md`.
+2. Copy `V1/MOSbius.py`, `V1/main.py`, and `V1/connections.json` to Pico root (`/`) as `MOSbius.py`, `main.py`, and `connections.json`.
+3. Edit `V1/connections.json` and run `V1/main.py`.
+
+### V2
+
+1. Read `V2/README.md`.
+2. Copy `V2/main.py`, `V2/config.json`, and `V2/lib/` to Pico root (`/`) as `main.py`, `config.json`, and `lib/`.
+3. Edit `V2/main.py` (pins/timing/config path) and run it.
+4. Optional host tools are under `V2/tools/`.
+
+## Automated Runtime Upload (Pico)
+
+Manual copy can be replaced with one command using `mpremote`.
+
+1. Install `mpremote` on your host:
+
+```bash
+pip install mpremote
+```
+
+2. Upload one flow to Pico root (`/`):
+
+```bash
+# Upload V1 runtime files as /main.py, /MOSbius.py, /connections.json
+scripts/upload_runtime.sh v1
+
+# Upload V2 runtime files as /main.py, /config.json, /lib/...
+scripts/upload_runtime.sh v2
+```
+
+Optional flags:
+
+```bash
+# Specify serial port explicitly
+scripts/upload_runtime.sh v2 --port /dev/tty.usbmodem1101
+
+# Remove known files from the other flow before upload
+scripts/upload_runtime.sh v2 --clean
+```
+
+## Host-Side Validation (V2)
+
+From the repository root:
+
+```bash
+python3 V2/tools/validate_register_equations.py
+python3 V2/tools/validate_sizing_equations.py
+```
+
+## Notes
+
+- Do not mix files, scripts, or config formats between `V1` and `V2`.
+- Both flows can run on desktop Python for bitstream generation without GPIO programming.

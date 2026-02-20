@@ -1,0 +1,101 @@
+import register_map_equations as reg_eq
+
+EXPECTED_BITS = 2008
+
+
+def _sbus_mode_to_pair(mode):
+    mode = (mode or "OFF").upper()
+    if mode == "ON":
+        return 1, 1
+    if mode == "PHI1":
+        return 1, 0
+    if mode == "PHI2":
+        return 0, 1
+    if mode == "OFF":
+        return 0, 0
+    raise ValueError("Invalid SBUS mode '{}'".format(mode))
+
+
+def _set_bit(bitstream, register, value, source, set_sources):
+    if register < 1 or register > EXPECTED_BITS:
+        raise ValueError("{}: register {} out of range 1..{}".format(source, register, EXPECTED_BITS))
+    index = register - 1
+    if set_sources is not None:
+        current = bitstream[index]
+        if set_sources[index] is not None and current != value:
+            raise ValueError(
+                "{}: conflicting write for register {} ({} -> {}, previous source: {})".format(
+                    source, register, current, value, set_sources[index]
+                )
+            )
+    bitstream[index] = value
+    if set_sources is not None:
+        set_sources[index] = source
+
+
+def build_bitstream(connections, sizes, pin_to_sw_matrix, track_sources=False):
+    bitstream = bytearray(EXPECTED_BITS)
+    set_sources = [None] * EXPECTED_BITS if track_sources else None
+
+    for bus, entries in connections.items():
+        if bus.startswith("RBUS"):
+            for terminal in entries:
+                sw_pin = pin_to_sw_matrix[terminal]
+                register = reg_eq.rbus_register(sw_pin, bus)
+                _set_bit(bitstream, register, 1, "RBUS {} {}".format(bus, terminal), set_sources)
+            continue
+
+        if bus.startswith("SBUS"):
+            has_suffix = bus[-1:] in ("a", "b")
+            for entry in entries:
+                terminal = entry["terminal"]
+                connection = entry["connection"]
+                sw_pin = pin_to_sw_matrix[terminal]
+
+                if has_suffix:
+                    register = reg_eq.sbus_register(sw_pin, bus)
+                    a, b = _sbus_mode_to_pair(connection)
+                    value = a if bus.endswith("a") else b
+                    _set_bit(
+                        bitstream,
+                        register,
+                        value,
+                        "SBUS {} {} {}".format(bus, terminal, connection),
+                        set_sources,
+                    )
+                    continue
+
+                reg_a = reg_eq.sbus_register(sw_pin, "{}a".format(bus))
+                reg_b = reg_eq.sbus_register(sw_pin, "{}b".format(bus))
+                a, b = _sbus_mode_to_pair(connection)
+                _set_bit(
+                    bitstream,
+                    reg_a,
+                    a,
+                    "SBUS {}a {} {}".format(bus, terminal, connection),
+                    set_sources,
+                )
+                _set_bit(
+                    bitstream,
+                    reg_b,
+                    b,
+                    "SBUS {}b {} {}".format(bus, terminal, connection),
+                    set_sources,
+                )
+            continue
+
+        raise ValueError("Unknown bus '{}'".format(bus))
+
+    for device, size in sizes.items():
+        for bit_weight in (1, 2, 4, 8, 16):
+            register = reg_eq.sizing_register(device, bit_weight)
+            value = 1 if (size & bit_weight) else 0
+            _set_bit(
+                bitstream,
+                register,
+                value,
+                "sizes {} bit {}".format(device, bit_weight),
+                set_sources,
+            )
+
+    return bitstream
